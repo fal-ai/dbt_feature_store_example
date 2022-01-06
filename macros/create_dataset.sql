@@ -54,3 +54,19 @@
     ON lb.{{ label_table_entity_id }} = {{ stage_table_model_name }}.{{ stage_table_entity_id_column }}
     AND lb.{{ label_table_timestamp }} = {{ stage_table_model_name }}.{{ stage_table_timestamp_column }}
 {% endmacro %}
+
+{% macro get_latest_timestamp(
+       feature_model_name,
+       feature_timestamp,
+       feature_entity
+    ) %}
+    WITH numbered_fg AS (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (PARTITION BY {{ feature_entity }} ORDER BY {{ feature_timestamp }} DESC) AS _fal_dedup
+            FROM {{ ref(feature_model_name) }}
+    )
+    SELECT *
+    FROM numbered_fg
+    WHERE _fal_dedup = 1
+{% endmacro %}
