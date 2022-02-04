@@ -17,10 +17,10 @@
     SELECT
         lb.{{ ns.label_table_entity_id_column }},
         lb.{{ ns.label_table_timestamp_column }},
-        lb.{{ label_name }},
         {% for column in feature_columns %}
-            {{ column }},
+        {{ column }},
         {% endfor %}
+        lb.{{ label_name }}
     FROM
         {{ ref(label_table_model) }} AS lb
 
@@ -33,7 +33,7 @@
             ns.label_table_timestamp_column,
             ns.label_table_entity_id_column
         ) }}
-    {% endfor %}
+        {% endfor %}
 {% endif %}
 {% endmacro %}
 

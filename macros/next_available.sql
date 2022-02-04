@@ -9,8 +9,8 @@ SELECT
         {{ column }},
     {% endfor %}
 
-    cast({{ entity_column }} AS STRING) AS __f__entity,
-    {{ timestamp_column }} AS __f__timestamp,
+    cast({{ entity_column }} AS string) AS __f__entity,
+    cast({{ timestamp_column }} AS timestamp) AS __f__timestamp,
     {{ next_timestamp(entity_column, timestamp_column) }} AS __f__next_timestamp
 FROM {{ feature_table }}
 {% endmacro %}
