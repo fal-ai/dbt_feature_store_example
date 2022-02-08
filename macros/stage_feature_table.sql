@@ -14,10 +14,9 @@ WITH __f__most_recent AS (
         {{ column }},
         {% endfor %}
 
-        -- TODO: remove casting?
-        cast({{ feature_entity_column }} AS string) AS __f__entity,
-        cast({{ feature_timestamp_column }} AS timestamp) AS __f__timestamp,
-        cast({{ next_timestamp(feature_entity_column, feature_timestamp_column) }} AS timestamp) AS __f__next_timestamp
+        {{ feature_entity_column }} AS __f__entity,
+        {{ feature_timestamp_column }} AS __f__timestamp,
+        {{ next_timestamp(feature_entity_column, feature_timestamp_column) }} AS __f__next_timestamp
     FROM {{ feature_table }}
 ), __f__label AS (
     SELECT
@@ -25,9 +24,8 @@ WITH __f__most_recent AS (
         {{ label_timestamp_column }},
         {{ label_column }},
 
-        -- TODO: remove casting?
-        cast({{ label_entity_column }} AS string) AS __f__entity,
-        cast({{ label_timestamp_column }} AS timestamp) AS __f__timestamp
+        {{ label_entity_column }} AS __f__entity,
+        {{ label_timestamp_column }} AS __f__timestamp
     FROM {{ label_table }}
 )
 
@@ -56,31 +54,33 @@ LEFT JOIN __f__most_recent AS mr
         feature_table_model,
         feature_columns=['*']
     ) %}
-{% set ns = namespace(
-    feature_entity_id_column = "",
-    feature_timestamp_column = "",
-    label_entity_id_column = "",
-    label_timestamp_column = ""
+{% set feature_table = namespace(
+    entity_id_column = "",
+    timestamp_column = "",
+) %}
+{% set label_table = namespace(
+    entity_id_column = "",
+    timestamp_column = ""
 ) %}
 {% if execute %}
 
 -- TODO: find node with just model name
 {% set node = graph.nodes["model.bike." + feature_table_model] %}
-{% set ns.feature_entity_id_column = node.config.meta.fal.feature_store.entity_id %}
-{% set ns.feature_timestamp_column = node.config.meta.fal.feature_store.timestamp %}
+{% set feature_table.entity_id_column = node.config.meta.fal.feature_store.entity_id %}
+{% set feature_table.timestamp_column = node.config.meta.fal.feature_store.timestamp %}
 
 {% set node = graph.nodes["model.bike." + label_table_model] %}
-{% set ns.label_entity_id_column = node.config.meta.fal.feature_store.entity_id %}
-{% set ns.label_timestamp_column = node.config.meta.fal.feature_store.timestamp %}
+{% set label_table.entity_id_column = node.config.meta.fal.feature_store.entity_id %}
+{% set label_table.timestamp_column = node.config.meta.fal.feature_store.timestamp %}
 
 {{ stage_feature_table(
     ref(label_table_model),
-    ns.label_entity_id_column,
-    ns.label_timestamp_column,
+    label_table.entity_id_column,
+    label_table.timestamp_column,
     label_column,
     ref(feature_table_model),
-    ns.feature_entity_id_column,
-    ns.feature_timestamp_column,
+    feature_table.entity_id_column,
+    feature_table.timestamp_column,
     feature_columns
 ) }}
 
