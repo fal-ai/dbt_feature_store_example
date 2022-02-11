@@ -2,7 +2,7 @@ WITH duration AS (
     SELECT
         bike_id,
         start_date,
-        {{ next_timestamp("bike_id", "start_date") }} AS next_start_date,
+        {{ feature_store.next_timestamp("bike_id", "start_date") }} AS next_start_date,
 
         -- features
         trip_count_last_week,
@@ -16,7 +16,7 @@ WITH duration AS (
     SELECT
         bike_id,
         cast(timestamp AS date) AS date,
-        {{ next_timestamp("bike_id", "cast(timestamp AS date)") }} AS next_date,
+        {{ feature_store.next_timestamp("bike_id", "cast(timestamp AS date)") }} AS next_date,
     FROM
         {{ ref("bike_maintenance") }}
 ), label AS (
@@ -37,7 +37,7 @@ SELECT
     label.date AS label_date
 FROM label
 LEFT JOIN duration
-    ON {{ label_feature_join(
+    ON {{ feature_store.label_feature_join(
             "label.bike_id",
             "label.date",
             "duration.bike_id",
@@ -45,7 +45,7 @@ LEFT JOIN duration
             "duration.next_start_date"
         ) }}
 LEFT JOIN maintenance
-    ON {{ label_feature_join(
+    ON {{ feature_store.label_feature_join(
             "label.bike_id",
             "label.date",
             "maintenance.bike_id",
