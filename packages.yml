@@ -1,3 +1,4 @@
 packages:
-  - package: dbt-labs/dbt_utils
-    version: 0.8.0
+  # TODO: use hub package (https://github.com/dbt-labs/hubcap/pull/96)
+  - git: https://github.com/fal-ai/dbt_feature_store.git
+    revision: d0e854d8d6a9287c1e375391a2ba240b651ccce3
