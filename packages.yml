@@ -1,4 +1,3 @@
 packages:
-  # TODO: use hub package (https://github.com/dbt-labs/hubcap/pull/96)
-  - git: https://github.com/fal-ai/dbt_feature_store.git
-    revision: d0e854d8d6a9287c1e375391a2ba240b651ccce3
+  - package: fal-ai/feature_store
+    version: [">=0.1.0", "<0.2.0"]
